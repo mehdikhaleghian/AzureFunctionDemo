@@ -13,23 +13,15 @@ namespace AzureFunctionsFundamental
         public static async Task<object> Run(
             [HttpTrigger("post", WebHookType = "genericJson", Route = "newpurchase")]HttpRequestMessage req, TraceWriter log)
         {
-            log.Info($"Webhook was triggered!");
-
-            string jsonContent = await req.Content.ReadAsStringAsync();
-            dynamic data = JsonConvert.DeserializeObject(jsonContent);
-
-            if (data.first == null || data.last == null)
-            {
-                return req.CreateResponse(HttpStatusCode.BadRequest, new
+            log.Info("Order Received");
+            var jsonContent = await req.Content.ReadAsStringAsync();
+            var order = JsonConvert.DeserializeObject<Order>(jsonContent);
+            log.Info($"Order {order.OrderId} received from {order.Email} for product {order.ProductId}");
+            return req.CreateResponse(HttpStatusCode.OK,
+                new
                 {
-                    error = "Please pass first/last properties in the input object"
+                    message = "thank you for your order"
                 });
-            }
-
-            return req.CreateResponse(HttpStatusCode.OK, new
-            {
-                greeting = $"Hello {data.first} {data.last}!"
-            });
         }
     }
 }
