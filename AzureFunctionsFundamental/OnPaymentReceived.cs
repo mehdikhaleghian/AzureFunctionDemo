@@ -11,7 +11,7 @@ namespace AzureFunctionsFundamental
     {
         [FunctionName("OnPaymentReceived")]
         public static async Task<object> Run(
-            [HttpTrigger(WebHookType = "genericJson",Route = "newpurchase")]HttpRequestMessage req, TraceWriter log)
+            [HttpTrigger("post", WebHookType = "genericJson", Route = "newpurchase")]HttpRequestMessage req, TraceWriter log)
         {
             log.Info($"Webhook was triggered!");
 
