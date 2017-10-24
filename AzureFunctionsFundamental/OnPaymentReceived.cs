@@ -11,12 +11,15 @@ namespace AzureFunctionsFundamental
     {
         [FunctionName("OnPaymentReceived")]
         public static async Task<object> Run(
-            [HttpTrigger("post", WebHookType = "genericJson", Route = "newpurchase")]HttpRequestMessage req, TraceWriter log)
+            [HttpTrigger("post", WebHookType = "genericJson", Route = "newpurchase")]HttpRequestMessage req, 
+            TraceWriter log,
+            [Queue("order")] IAsyncCollector<Order> orderQueue)
         {
             log.Info("Order Received");
             var jsonContent = await req.Content.ReadAsStringAsync();
             var order = JsonConvert.DeserializeObject<Order>(jsonContent);
             log.Info($"Order {order.OrderId} received from {order.Email} for product {order.ProductId}");
+            await orderQueue.AddAsync(order);
             return req.CreateResponse(HttpStatusCode.OK,
                 new
                 {
