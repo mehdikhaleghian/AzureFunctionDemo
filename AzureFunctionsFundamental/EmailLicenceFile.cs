@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using SendGrid.Helpers.Mail;
@@ -10,10 +9,13 @@ namespace AzureFunctionsFundamental
     public static class EmailLicenceFile
     {
         [FunctionName("EmailLicenceFile")]
-        public static void Run([BlobTrigger("licences/{fileName}.lic")]string myBlob, string fileName, TraceWriter log,
+        public static void Run([BlobTrigger("licences/{fileName}.lic")]string myBlob, string fileName,
+            [Table("Order", partitionKey: "Orders", rowKey: "{fileName}")] Order orderRow,
+            TraceWriter log,
             [SendGrid] out Mail message)
         {
-            var email = Regex.Match(myBlob, @"^Email\:\ (.+)$", RegexOptions.Multiline).Groups[1].Value.Trim();
+            //var email = Regex.Match(myBlob, @"^Email\:\ (.+)$", RegexOptions.Multiline).Groups[1].Value.Trim();
+            var email = orderRow.Email;
             log.Info($"Got order from {email}\n Lincence file name: {fileName}");
 
             message = new Mail();
