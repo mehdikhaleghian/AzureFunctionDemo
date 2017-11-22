@@ -17,8 +17,8 @@ namespace AzureFunctionsFundamental
             [Table("Order")] IAsyncCollector<Order> orderTable)
         {
             log.Info("Order Received");
-            var jsonContent = await req.Content.ReadAsStringAsync();
-            var order = JsonConvert.DeserializeObject<Order>(jsonContent);
+            var order = await req.Content.ReadAsAsync<Order>();
+            //var order = JsonConvert.DeserializeObject<Order>(jsonContent);
             log.Info($"Order {order.OrderId} received from {order.Email} for product {order.ProductId}");
             await orderQueue.AddAsync(order);
 
